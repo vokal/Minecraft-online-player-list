@@ -3,6 +3,10 @@ var express = require('express');
 var app = express(express.logger());
 app.use(express.bodyParser());
 
+app.get('/', function(req, res) {
+    res.send('OKAY');
+});
+
 app.post('/update', function(req, res) {
     console.log(req.body);
     res.send('OKAY');
