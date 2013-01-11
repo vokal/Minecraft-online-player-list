@@ -4,15 +4,23 @@ html
     title
       | VOKAL Minecraft Player List
     link(href="css/bootstrap.min.css", rel="stylesheet", media="screen")
+    script(src="/socket.io/socket.io.js")
   body
-    table.table.table-bordered.table-hover
+
+    table#player-list.table.table-bordered.table-hover
+
+    script(id="header_row", type="text/html")
       tr
         th Player
-        th (X, Y, Z)
-      for p in players
-        tr
-          td #{p.player}
-          td (#{p.x}, #{p.y}, #{p.z})
+        th X, Y, Z
+
+    script(id="player_row", type="text/html")
+      tr
+        td {{player}}
+        td {{x}}, {{y}}, {{z}}
 
     script(src="http://code.jquery.com/jquery-latest.js")
+    script(src="http://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.4.3/underscore-min.js")
+    script(src="http://cdnjs.cloudflare.com/ajax/libs/ICanHaz.js/0.10/ICanHaz.min.js")
     script(src="js/bootstrap.min.js")
+    script(src="js/index.js")
