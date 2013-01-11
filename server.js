@@ -3,12 +3,17 @@ var express = require('express');
 var app = express(express.logger());
 app.use(express.bodyParser());
 
+var players = [];
+
 app.get('/', function(req, res) {
-    res.send('OKAY');
+    res.render('index.jade', {
+        players: players
+    });
 });
 
 app.post('/update', function(req, res) {
     console.log(req.body);
+    players = req.body
     res.send('OKAY');
 });
 
