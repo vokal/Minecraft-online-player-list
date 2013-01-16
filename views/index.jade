@@ -7,13 +7,15 @@ html
     script(src="/socket.io/socket.io.js")
   body
 
-    table#player-list.table.table-bordered.table-hover
+    table.table.table-bordered.table-hover
+      thead
+        tr
+          th Player
+          th (X, Y, Z)
+          th Realm
+      tbody#player-list
 
     script(id="header_row", type="text/html")
-      tr
-        th Player
-        th (X, Y, Z)
-        th Realm
 
     script(id="player_row", type="text/html")
       tr
