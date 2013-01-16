@@ -28,11 +28,11 @@ server.listen(port, function() {
     console.log("Listening on " + port);
 });
 
-io.configure(function () { 
-    io.set("transports", ["xhr-polling"]); 
-    io.set("polling duration", 10); 
-});
-
 io.sockets.on('connection', function (socket) {
     socket.emit('players', { players: players });
+
+    socket.on('update', function (data) {
+        console.log(data);
+        io.sockets.emit('players', { players: data });
+    });
 });
