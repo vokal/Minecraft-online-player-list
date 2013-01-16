@@ -32,7 +32,8 @@ io.sockets.on('connection', function (socket) {
     socket.emit('players', { players: players });
 
     socket.on('update', function (data) {
+        console.log("Incoming -> ");
         console.log(data);
-        io.sockets.emit('players', { players: data });
+        io.sockets.emit('players', data);
     });
 });
