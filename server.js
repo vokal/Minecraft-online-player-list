@@ -10,7 +10,10 @@ app.configure(function() {
     app.use(express.static(__dirname + '/static'));
 });
 
-var players = [];
+var players = {
+    'players': [],
+    'death_points': [],
+};
 
 app.get('/', function(req, res) {
     res.render('index.jade', {});
@@ -19,7 +22,7 @@ app.get('/', function(req, res) {
 app.post('/update', function(req, res) {
     console.log(req.body);
     players = req.body
-    io.sockets.emit('players', { players: players });
+    io.sockets.emit('players', players);
     res.send('OKAY');
 });
 
@@ -29,7 +32,7 @@ server.listen(port, function() {
 });
 
 io.sockets.on('connection', function (socket) {
-    socket.emit('players', { players: players });
+    socket.emit('players', players);
 
     socket.on('update', function (data) {
         console.log("Incoming -> ");
