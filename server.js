@@ -19,26 +19,9 @@ app.configure(function() {
 });
 
 var mongo_server = new Server(mongo_uri, mongo_port, { autoreconnect: true })
-var db = new Db(mongo_db, mongo_server, { native_parser:false });
+var db = new Db(mongo_db, mongo_server, { native_parser:false, safe:false });
 
 var location_update_counter = location_update_interval;
-
-db.open(function(err, db) {
-    if (!err) {
-        console.log("Connected to 'mapserve' database");
-        db.collection('player_locations', {safe:true}, function(err, collection) {
-            if (err) {
-                console.log("The 'player_locations' collection doesn't exist.");
-            }
-        });
-
-        db.collection('deathpoint_locations', {safe:true}, function(err, collection) {
-            if (err) {
-                console.log("The 'deathpoint_locations' collection doesn't exist.");
-            }
-        });
-    }
-});
 
 var players = {
     'players': [],
@@ -97,7 +80,35 @@ io.sockets.on('connection', function (socket) {
     });
 });
 
-var port = process.env.PORT || 5000;
-server.listen(port, function() {
-    console.log("Listening on " + port);
+// MongoHQ can be slow to connect, so we need to hold off on starting
+// the webserver until that connection is established
+db.open(function(err, db) {
+    var username = process.env.MONGO_USERNAME || '';
+    var password = process.env.MONGO_PASSWORD || '';
+    db.authenticate(username, password, function(err, conn) {
+        if (err) {
+            console.log(err);
+            return;
+        }
+
+        console.log("Database opened");
+
+        db.collection('player_locations', {safe:true}, function(err, collection) {
+            if (err) {
+                console.log("The 'player_locations' collection doesn't exist.");
+            }
+        });
+
+        db.collection('deathpoint_locations', {safe:true}, function(err, collection) {
+            if (err) {
+                console.log("The 'deathpoint_locations' collection doesn't exist.");
+            }
+        });
+
+        // Now that we've connected to the database, let's start the webserver
+        var port = process.env.PORT || 5000;
+        server.listen(port, function() {
+            console.log("Listening on " + port);
+        });
+    });
 });
