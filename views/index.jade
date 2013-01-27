@@ -31,8 +31,8 @@ html
     script(id="player_row", type="text/html")
       tr
         td 
-          //- img(src="http://overviewer.org/avatar/{{player}}", height="16", width="8") 
-          {{player}}
+          a(href="/{{ location_type }}/{{ player }}")
+            {{player}}
         td ({{x}}, {{y}}, {{z}})
         td {{realm}}
 

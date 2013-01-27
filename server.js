@@ -66,22 +66,41 @@ app.get('/deathpoints/:player', function(req, res) {
     });
 });
 
+app.get('/players', function(req, res) {
+    db.collection('players', function(err, players) {
+        players.find({}).toArray(function(err, pl) {
+            res.json(pl);
+        });
+    });
+});
+
 app.post('/update', function(req, res) {
-    console.log(req.body);
     players = req.body
     io.sockets.emit('players', players);
     res.send('OKAY');
 });
 
-function updateLocations(data) {
-    db.collection('player_locations', function(err, player_locations) {
-        player_locations.ensureIndex({timestamp: 1}, {unique:true}, function(err, indexName) {
-            db.collection('deathpoint_locations', function(err, deathpoint_locations) {
-                deathpoint_locations.ensureIndex({timestamp: 1}, {unique:true}, function(err, indexName) {
-                    player_locations.insert(data.players);
-                    deathpoint_locations.insert(data.death_points);
-                });
+function updateRecords(data) {
+    db.collection('players', function(err, players) {
+        player_list = []
+        for (var i in data.players) {
+            player_list.push({
+                player: data.players[i].player,
             });
+        }
+        
+        players.ensureIndex({player: 1}, {unique:true}, function(err, indexName) {
+            players.insert(player_list);
+        });
+    });
+
+    db.collection('player_locations', function(err, player_locations) {
+        player_locations.insert(data.players);
+    });
+
+    db.collection('deathpoint_locations', function(err, deathpoint_locations) {
+        deathpoint_locations.ensureIndex({timestamp: 1}, {unique:true}, function(err, indexName) {
+            deathpoint_locations.insert(data.death_points);
         });
     });
 }
@@ -95,8 +114,8 @@ io.sockets.on('connection', function (socket) {
         io.sockets.emit('players', data);
 
         if (location_update_counter == 0) {
-            console.log('Updating locations');
-            updateLocations(data);
+            console.log('Location update -> ');
+            updateRecords(data);
             location_update_counter = location_update_interval;
         } else {
             location_update_counter--;
@@ -132,6 +151,12 @@ db.open(function(err, db) {
 });
 
 var runserver = function() {
+    db.collection('players', {safe:true}, function(err, collection) {
+        if (err) {
+            console.log("The 'players' collection doesn't exist.");
+        }
+    });
+
     db.collection('player_locations', {safe:true}, function(err, collection) {
         if (err) {
             console.log("The 'player_locations' collection doesn't exist.");

@@ -8,6 +8,7 @@ socket.on('players', function(data) {
         data.players[i].x = data.players[i].x.toFixed(2);
         data.players[i].y = data.players[i].y.toFixed(2);
         data.players[i].z = data.players[i].z.toFixed(2);
+        data.players[i].location_type = 'locations';
 
         $('tbody#player-list').append(ich.player_row(data.players[i]));
     }
@@ -17,6 +18,8 @@ socket.on('players', function(data) {
     	data.death_points[i].x = data.death_points[i].x.toFixed(2);
     	data.death_points[i].y = data.death_points[i].y.toFixed(2);
     	data.death_points[i].z = data.death_points[i].z.toFixed(2);
+        data.death_points[i].location_type = 'deathpoints';
+
         $('tbody#death-list').append(ich.player_row(data.death_points[i]));
     }
 
