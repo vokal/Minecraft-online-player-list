@@ -67,9 +67,28 @@ app.get('/deathpoints/:player', function(req, res) {
 });
 
 app.get('/players', function(req, res) {
+    var result = [];
+    var threshold = 0;
+
+    var last_known_location = function(player) {
+        db.collection('player_locations', function(err, player_locations) {
+            player_locations.find({'player': player}).sort({'timestamp':-1}).limit(1).toArray(function(err, p) {
+                result.push(p[0]);
+
+                if (result.length == threshold) {
+                    res.json(result);
+                }
+            });
+        });
+    };
+
     db.collection('players', function(err, players) {
         players.find({}).toArray(function(err, pl) {
-            res.json(pl);
+            threshold = pl.length;
+
+            for (var i in pl) {
+                last_known_location(pl[i].player);
+            }
         });
     });
 });
@@ -111,6 +130,7 @@ io.sockets.on('connection', function (socket) {
     socket.emit('players', players);
 
     socket.on('update', function (data) {
+        players = data;
         io.sockets.emit('players', data);
 
         if (location_update_counter == 0) {
